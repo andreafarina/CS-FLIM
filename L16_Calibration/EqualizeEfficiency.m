@@ -4,6 +4,8 @@ function y = EqualizeEfficiency(data,range)
 %        [i2, j2;...]
 % where j1 = i2, etc...
 % equalize efficiency curves taken with different reference samples
+% 2021/0405 - Andrea Farina, CNR-POLIMI
+
 Ncurve = size(data,2);
 if Ncurve < 2
     disp('No curves ti equalize, only 1 curve');

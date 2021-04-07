@@ -1,4 +1,11 @@
 function [lambda,p_baric] = PolynomialFit(lambda0,spectrum,order)
+% polynomial fit of the wavelengths based on the baricenter of the
+% time-resolved multichannel data
+% lambda0:  nominal wavelengths
+% spectrum: spectrum obtained by the multichannel detector
+% order:    order of the polynomial fit (typical 1).
+% lambda:   calbrated lambda
+% p_baric:  baricenter position in channel units.
 
 Nchan = length(spectrum);
 p = 1:Nchan;
