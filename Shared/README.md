@@ -1,6 +1,4 @@
 # SHARED UTILITIES
-
-### Shared utilities ###
 - f_read_sdt_01.m:    Reading function for Becker&Hickl sdt binary files.
 - ReadSpectrum_HAM.m: Reading fonction for csv spectra acquired with Hammamatsu spectrometer.
 - loadSPE.m:          Reading functions for camera data: Roper Princeton.
