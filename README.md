@@ -2,7 +2,7 @@
 Code for Data Management, Calibration and Analysis used for Hyperspectral FLuorescence Lifetime Imaging based on Compressed-Sensing.
 ### Installation instructions:
 1) clone the repository to a local folder.
-2) lunch Matlab
+2) launch Matlab
 3) run CS_FILM_install.m to set path and environment variables.
 #
 
