@@ -1,0 +1,4 @@
+#ignore output files
+*.mat
+*.csv
+*.sdt
