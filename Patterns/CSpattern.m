@@ -101,7 +101,7 @@ classdef CSpattern
             obj.stack = reshape(obj.Mmatrix',[obj.dim(1),obj.dim(2),obj.Npatt]);
         end
         
-        function [] = showPatterns(obj,space)
+        function [] = ShowPatterns(obj,space)
             %SHOWPATTERNS show patterns as mosaic
             %   Detailed explanation goes here
             if nargin<2
