@@ -4,33 +4,43 @@ function [had] = PosNeg2Pos(spc,N,method)
 % N is the number of negative pattern to be use to reconstruct CWs
 
 % method is a way to use CWs: if I have 20 CWs I can do a mean, or
-% interpolate between them. 
+% an interpolation between them.
 
-[~,p] = max(sum(spc,1:2));
-CWs = spc;
-CWs(:,:,p:(p+1)) = [];
-CWs = PosNeg2Had(CWs);
-pos_number = round(linspace(0,size(CWs,3),2*N+1));
-pos_number = pos_number(2:2:end);
-
-spc_1 = spc(:,:,1:2:end);
-CWs = CWs(:,:,pos_number);
-CW = Pattern_reconstruction(CWs,spc_1,pos_number,method);
-had = 2.*spc_1-CW;
-
+indexCW = zeros(1,size(spc,3));
+indexCW(1:2:end) = 1;
+if N == 1
+    neg2save = 2;
+else
+    [~,d] = find((indexCW == 0));
+    b = round(linspace(1,numel(d),N));
+    neg2save = d(b);
 end
 
+CWs = spc(:,:,neg2save-1) + spc(:,:,neg2save);
 
-function [CW] = Pattern_reconstruction(CWs,spc,pos_number,method)
-if strcmp(method,'Mean')
+if strcmp(method,'Mean') || length(neg2save) == 1
     CW = mean(CWs,3);
 else
-    D = round(diff(pos_number));
-    P = [];
-    for l = 1:length(D)
-        P = [P repmat(l,[1 D(l)])];
+    if size(spc,1) == 1 && size(spc,2) == 1
+        CW = permute(interp1(neg2save/2, squeeze(CWs),1:size(spc,3)/2),[3 1 2]);
+    elseif size(spc,1) == 1 || size(spc,2) == 1
+        p = find(size(spc)~=1);
+        [l,k] = meshgrid(neg2save/2,1:size(spc,p(1)));
+        [lq,kq] = meshgrid(1:size(spc,3)/2,1:size(spc,p));
+        CW = interp2(l,k,squeeze(CWs),lq,kq);
+        if size(spc,1) == 1
+            CW = permute(CW,[3 1 2]);
+        else
+            CW = permute(CW,[1 3 2]);
+        end
+    else
+        [t,l,k] = ndgrid(1:size(spc,1),1:size(spc,2),neg2save/2);
+        [tq,lq,kq] = ndgrid(1:size(spc,1),1:size(spc,2),1:size(spc,3)/2);
+        CW = interpn(t,l,k,CWs,tq,lq,kq);
     end
-    P = [P repmat(length(pos_number),[1 (size(spc,3) - size(P,2))])];
-    CW = CWs(:,:,P);
 end
+
+had = 2.*spc(:,:,1:2:end)-CW;
+
 end
+
