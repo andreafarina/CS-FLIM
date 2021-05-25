@@ -95,7 +95,7 @@ classdef CSpattern
                 rstack(:,:,i) = imresize(obj.stack(:,:,i),dim,'box');
             end
             obj.stack = rstack;
-            obj.Mmatrix = (reshape(rstack,[prod(dim),obj.Npatt]))';
+            %obj.Mmatrix = (reshape(rstack,[prod(dim),obj.Npatt]))';Not needed to resample meas-matrix
             obj.dim = dim;
         end
         
@@ -127,6 +127,17 @@ classdef CSpattern
             obj.Mmatrix = obj.Mmatrix./max(obj.Mmatrix,[],2);
             obj.stack = reshape(obj.Mmatrix',[obj.dim(1),obj.dim(2),obj.Npatt]);
             obj.kind = 'shifted';
+        end
+        
+        function obj = padToFitDim(obj,dim2)
+            dd = round((dim2-obj.dim)/2);
+            rstack = padarray(obj.stack,[dd(1),dd(2),0],'both');
+            obj.dim = dim2;
+            obj.stack = rstack;
+        end
+            
+        function obj = TransposeStack(obj)
+            obj.stack = permute(obj.stack,[2,1,3]);
         end
         
         function obj = DeleteCW(obj)
@@ -234,6 +245,15 @@ classdef CSpattern
                     pattern = obj.stack;
                     M = obj.Mmatrix;
                     save(prefix,'pattern','M');
+                case 'hdf'
+                    filename = [prefix,'.hdf5'];
+                    dataset = '/Sequence';
+                    s = permute(s,[3,2,1]);
+                    H5WriteStack(filename,dataset,s,['uint',num2str(bitdepth)]);
+                    h5writeatt(filename,dataset,'type',obj.type);
+                    h5writeatt(filename,dataset,'order',uint8(obj.order));
+                    h5writeatt(filename,dataset,'kind',obj.kind);
+                    h5writeatt(filename,dataset,'cw',uint8(obj.cw));
             end
         end
     end
