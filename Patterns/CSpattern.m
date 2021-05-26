@@ -248,7 +248,7 @@ classdef CSpattern
                 case 'hdf'
                     filename = [prefix,'.hdf5'];
                     dataset = '/Sequence';
-                    s = permute(s,[3,2,1]);
+                    %s = permute(s,[3,2,1]);
                     H5WriteStack(filename,dataset,s,['uint',num2str(bitdepth)]);
                     h5writeatt(filename,dataset,'type',obj.type);
                     h5writeatt(filename,dataset,'order',uint8(obj.order));
