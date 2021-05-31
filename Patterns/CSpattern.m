@@ -27,7 +27,7 @@ classdef CSpattern
             %   create M
             if nargin > 2
                 obj.seed = seed;
-                rnd(see);
+                rng(seed);
             end
             switch lower(type)
                 case 'hadamard'
@@ -59,7 +59,7 @@ classdef CSpattern
                     obj.Pr = I(randperm(K),:);
                     obj.Pc = I(randperm(K),:);
                     obj.Mmatrix = obj.Pr * H * obj.Pc;
-                    obj.Tmatrix = obj.Mmatrix;
+                    obj.Tmatrix = obj.Mmatrix';
                     obj.stack = reshape(obj.Tmatrix,[order,order,order^2]);
                     obj.order = order;
                     obj.cw = 1;
@@ -87,6 +87,8 @@ classdef CSpattern
             obj.stack = reshape(obj.Tmatrix,[obj.order,obj.order,obj.order^2]);
             obj.dim = [obj.order,obj.order];
             obj.Npatt = size(obj.Tmatrix,1);
+            obj.cw = 1;
+            obj.kind = [];
         end
         
         function obj = resample(obj,dim)
@@ -144,11 +146,21 @@ classdef CSpattern
             if obj.cw == 0
                 disp('this pattern does not have a CW');
             end
-            a = sum(obj.Tmatrix,2);
+            a = sum(obj.Mmatrix,2);
             [~,imax] = max(a);
             obj.Mmatrix(imax,:) = [];
             obj.stack(:,:,imax) = [];
             obj.Npatt = obj.Npatt - 1;
+            obj.cw = 0;
+        end
+        
+        function obj = TurnOffCW(obj)
+            if obj.cw == 0
+                disp('this pattern does not have a CW');
+            end
+            a = sum(obj.Mmatrix,2);
+            [~,imax] = max(a);
+            obj.stack(:,:,imax) = zeros(size(obj.stack,1), size(obj.stack,2));
             obj.cw = 0;
         end
         
