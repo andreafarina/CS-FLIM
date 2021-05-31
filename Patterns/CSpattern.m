@@ -245,9 +245,14 @@ classdef CSpattern
             switch lower(fmt(1:3))
                 case 'png'
                     for i = 1:obj.Npatt
-                        imwrite(s(:,:,i),[prefix,'_',num2str(i-1),'.',fmt]);
+                        if strcmpi(fmt,'png2')
+                            imwrite(s(:,:,i),[prefix,'_0_',num2str(i-1),'.',fmt(1:3)]);
+                        else
+                            imwrite(s(:,:,i),[prefix,'_',num2str(i-1),'.',fmt(1:3)]);
+                        end
+                            
                     end
-                case 'tif'
+               case 'tif'
                     filename = [prefix,'.tif'];
                     imwrite(s(:,:,1),filename);
                     for i = 2:obj.Npatt
