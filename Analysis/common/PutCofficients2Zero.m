@@ -1,4 +1,4 @@
-function [had] = PutCofficients2Zero(had,ratio)
+function [had,position_to_survive] = PutCofficients2Zero(had,ratio)
 % According to the amplitude of Hadamard coefficients, put to zero the
 % lowest according to a number defined percentually (0,1) by "ratio"
 compress_had = had;
