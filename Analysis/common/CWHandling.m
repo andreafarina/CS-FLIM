@@ -1,4 +1,4 @@
-function [spc] = CWHandling(spc,CW_type,pattern_type)
+function [spc] = CWHandling(spc,CW_type,pattern_type,CW)
 
 if strcmp(pattern_type,'Pos-Neg')
     if strcmp(CW_type,'Measured')
@@ -13,6 +13,16 @@ if strcmp(pattern_type,'Pos-Neg')
         [~,b(2)] = min(sum(dato,1:2));
         b = sort(b,'ascend');
         spc = Change2CW(spc,b(1));
+    end
+elseif strcmp(pattern_type,'Shifted')
+    if strcmp(CW_type,'Measured')
+        return;
+    elseif strcmp(CW_type,'Not measured')
+        [~,notCW] = min(squeeze(sum(spc,1:2)));
+        spc(:,:,notCW) = CW(:,:,notCW);
+    elseif strcmp(CW_type,'Measured, but exclude')
+        [~,notCW] = max(squeeze(sum(spc,1:2)));
+        spc(:,:,notCW) = CW(:,:,notCW);        
     end
 end
 
