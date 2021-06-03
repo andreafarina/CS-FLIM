@@ -1,9 +1,11 @@
 # SHARED UTILITIES
 - f_read_sdt_01.m:    Reading function for Becker&Hickl sdt binary files.
-- ReadSpectrum_HAM.m: Reading fonction for csv spectra acquired with Hammamatsu spectrometer.
+- ReadSpectrum_HAM.m: Reading function for csv spectra acquired with Hammamatsu spectrometer.
+- ReadSpectrum_OO.m : Reading function for txt spectra acquired with Ocean Optics spectrometer.
 - loadSPE.m:          Reading functions for camera data: Roper Princeton.
 - PointGreyReadRaw.m: Reading function for CMOS camera data: PointGrey camera.
-
+- ReadSDT_ContFlow.m: Reading function for Becker&Hickl sdt binary files acquired in Continuous Flow mode
+- SaveCCD_SPC_Data.m: Converts pattern scan data in a single .mat file.
 
 <!-- # Markdown Cheat Sheet
 
