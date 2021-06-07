@@ -5,20 +5,20 @@ function SaveCCD_SPC_Data
 % Alberto Ghezzi - Polimi - 26/05/2021
 % =========================================================================
 %% Select if CCD file or SPC file
-CCD = 0;
-SPC = 1;
+CCD = 1;
+SPC = 0;
 MANTA = 0;
 %% Path
-data_folder = '\\nas-dfis.fisica.polimi.it\work\DATA\CS_FLIM\UJI2';
-out_folder = 'C:\Users\ghezz\OneDrive - Politecnico di Milano\';
+data_folder = '\\nas-dfis.fisica.polimi.it\work\DATA\CS_FLIM\Microscope';
+out_folder = 'C:\Users\ghezz\OneDrive - Politecnico di Milano\FLIM Setup\Data\';
 ccd_ext='SPE';
 tr_ext='sdt'; %if manta -> sdtm
 
 %% Measurement info
-day = '20210430';
-prefix = 'UJI_20210430';
-N_Pattern_IN = 2049;%16*16*2+1;                          % Input pattern number                                          % Angle number
-N_Pattern_OUT = 1;%2*8*8;%16*16*2+1;               % Output pattern number
+day = '20210607';
+prefix = '520_CELLS10_550_550_610';
+N_Pattern_IN = 1;%16*16*2+1;                          % Input pattern number                                          % Angle number
+N_Pattern_OUT = 2;%2*8*8;%16*16*2+1;               % Output pattern number
 
 CF = 0; % Select if the SPC has been acquired with Continuous Flow (1 = Yes)
 
@@ -69,7 +69,15 @@ if CCD == 1
 end
 %% SPC file
 if SPC == 1
-    spc = zeros(Num_chan,N_lambda,N_Pattern_IN,N_Pattern_OUT);
+    
+    if N_Pattern_IN == 1
+        spc = zeros(Num_chan,N_lambda,N_Pattern_OUT);
+    elseif N_Pattern_OUT == 1
+        spc = zeros(Num_chan,N_lambda,N_Pattern_IN);
+    else
+        spc = zeros(Num_chan,N_lambda,N_Pattern_IN,N_Pattern_OUT);
+    end
+    
     tic;
     if CF == 0
         for j = 1:N_Pattern_IN
@@ -78,13 +86,12 @@ if SPC == 1
                 spc(:,:,j,k) = reshape(all_data,[Num_chan N_lambda]);
             end
         end
-        spc = squeeze(spc);
     else
-        data = ReadSDT_ContFlow(filepath,Num_chan,N_lambda,(N_Pattern_OUT-1)/(2^17/Num_chan),2^17/Num_chan);
+        bits = 2^21/2^ceil(log2(N_lambda));
+        data = ReadSDT_ContFlow(filepath,Num_chan,N_lambda,(N_Pattern_OUT-1)/(bits/Num_chan),bits/Num_chan);
         [~,b] = min(sum(data,1:2));
         spc(:,:,1) = data(:,:,b); % Replicate the "off pattern" measurement and put it at the beginning, to be used as a background
         spc(:,:,2:end) = data;
-        spc = squeeze(spc);
     end
     toc;
     
