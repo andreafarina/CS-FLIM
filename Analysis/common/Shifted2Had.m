@@ -18,6 +18,11 @@ else
 end
 
 CWs = spc(:,:,neg2save-1) + spc(:,:,neg2save);
+[n,m] = find(squeeze(sum(CWs,1:2))<0.1*mean(squeeze(sum(CWs,1:2))));
+
+if size(m,1) ~= 0 && size(CWs,3)>m+1
+ CWs(:,:,m) = CWs(:,:,m+1);
+end
     if size(spc,1) == 1 && size(spc,2) == 1
         CW = permute(interp1(linspace(1,K^2,N), squeeze(CWs),1:K^2),[3 1 2]);
     elseif size(spc,1) == 1 || size(spc,2) == 1
