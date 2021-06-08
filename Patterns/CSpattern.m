@@ -74,6 +74,17 @@ classdef CSpattern
                     
                 case 'fourier'
                     % to be implemented
+                case 'demo_numbers'
+                    dd = [512,512];
+                    obj.dim = [order,order];
+                    obj.order = order;
+                    obj.Mmatrix = zeros(order,order);
+                    obj.Tmatrix = zeros(order,order);
+                    obj.stack = zeros(dd(1),dd(2),order);
+                    for i = 1:order
+                        obj.stack(:,:,i) = ...
+                            imresize(text2im(num2str(i-1)),dd,'box');
+                    end
                 otherwise
                     disp('Pattern not found');
                     return;
