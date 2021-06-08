@@ -75,7 +75,7 @@ classdef CSpattern
                 case 'fourier'
                     % to be implemented
                 case 'demo_numbers'
-                    dd = [512,512];
+                    dd = [128,128];
                     obj.dim = [order,order];
                     obj.order = order;
                     obj.Mmatrix = zeros(order,order);
@@ -145,12 +145,26 @@ classdef CSpattern
         function obj = padToFitDim(obj,dim2)
             dd = round((dim2-obj.dim)/2);
             rstack = padarray(obj.stack,[dd(1),dd(2),0],'both');
+            %check dimensions
+            if size(rstack,1)~=dim2(1)
+                delta = size(rstack,1) - dim2(1);
+                rstack(end-delta+1,:,:) = [];
+            end
+            if size(rstack,2)~=dim2(2)
+                delta = size(rstack,2) - dim2(2);
+                rstack(:,end-delta+1,:) = [];
+            end    
             obj.dim = dim2;
             obj.stack = rstack;
         end
             
         function obj = TransposeStack(obj)
             obj.stack = permute(obj.stack,[2,1,3]);
+        end
+        
+        function obj = RotateStack(obj,angle)
+            obj.stack = imrotate(obj.stack,angle);
+            obj.dim = [size(obj.stack,1),size(obj.stack,2)];
         end
         
         function obj = DeleteCW(obj)
