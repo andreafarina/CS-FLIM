@@ -75,14 +75,14 @@ classdef CSpattern
                 case 'fourier'
                     % to be implemented
                 case 'demo_numbers'
-                    dd = [128,128];
+                    dd = [256,256];
                     obj.dim = [order,order];
                     obj.order = order;
                     obj.Mmatrix = zeros(order,order);
                     obj.Tmatrix = zeros(order,order);
                     obj.stack = zeros(dd(1),dd(2),order);
                     for i = 1:order
-                        obj.stack(:,:,i) = ...
+                        obj.stack(:,:,i) = 1 -...
                             imresize(text2im(num2str(i-1)),dd,'box');
                     end
                 otherwise
