@@ -18,7 +18,7 @@ for li = 1:size(lifetime,1)
         % lower than 360° (both 0° and 360° are red).
         I(:,:,1) = I(:,:,1).*(260/360);
         I(:,:,2) = ones([size(I,1) size(I,2)]);
-        I(:,:,3) = squeeze(concentration(li,:,:,n));
+        I(:,:,3) = squeeze(concentration(li,:,:,n)./max(concentration(:)));
         
         imagesc(hsv2rgb(I)),axis image,
         hsv = [flipud(linspace(0,260/360,255)); ones(1,255);ones(1,255)]';
