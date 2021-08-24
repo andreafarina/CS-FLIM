@@ -85,6 +85,14 @@ classdef CSpattern
                         obj.stack(:,:,i) = 1 -...
                             imresize(text2im(num2str(i-1)),dd,'box');
                     end
+                 case 'raster_scan'
+                    obj.dim = [order,order];
+                    obj.Mmatrix = eye(order^2, order^2);
+                    obj.Tmatrix = obj.Mmatrix;
+                    obj.stack = reshape(obj.Mmatrix,[order,order,order^2]);
+                    obj.order = order;
+                    obj.cw = 0;
+                     
                 otherwise
                     disp('Pattern not found');
                     return;
