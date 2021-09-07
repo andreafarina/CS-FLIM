@@ -260,7 +260,7 @@ classdef CSpattern
             figure,imagesc(obj.Mmatrix);
         end
         
-        function [] = SaveStack(obj,bitdepth,fmt)
+        function [prefix] = SaveStack(obj,bitdepth,fmt,suffix)
             if sum(obj.Mmatrix(:)<0) > 0
                 disp('Convert to positive before save!');
                 return;
@@ -274,7 +274,13 @@ classdef CSpattern
                     s = im2uint16(obj.stack);
             end
             selpath = uigetdir(pwd);
-            prefix = [selpath,filesep,obj.type,'_',num2str(obj.order)];
+            if nargin == 4
+                filename = ['_', suffix];
+            else
+                filename = [];
+            end
+            
+            prefix = [selpath,filesep,obj.type,'_',num2str(obj.order),filename];
             switch lower(fmt(1:3))
                 case 'png'
                     for i = 1:obj.Npatt
