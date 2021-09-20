@@ -8,15 +8,23 @@
 %
 % A. Bassi - Dipartamento di Fisica - Politecnico di Milano - ??/??/????
 % N. Ducros- Dipartamento di Fisica - Politecnico di Milano - 11/02/2010
+% A. Ghezzi- Dipartamento di Fisica - Politecnico di Milano - 14/09/2021
 
 function out = loadSPE(file,image_size)
 
-if nargin>=2,   Nx = image_size(1); Ny = image_size(2);
-else            Nx = 512; Ny = 512;
-end;
+if nargin>=2   
+    Nx = image_size(1); Ny = image_size(2);
+    if length(image_size) == 2
+        Nz = 1;
+    else
+        Nz = image_size(3);
+    end
+else
+    Nx = 512; Ny = 512; Nz = 1;
+end
 
 fid     = fopen(file,'r');
-im      = fread(fid,Nx*Ny,'uint16');
+im      = fread(fid,Nx*Ny*Nz,'uint16');
 fclose(fid);
-out = reshape(im,Nx,Ny)';
+out = squeeze(permute(reshape(im,Nx,Ny,Nz),[2 1 3]));
 return;
