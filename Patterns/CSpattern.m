@@ -189,11 +189,20 @@ classdef CSpattern
             
         function obj = TransposeStack(obj)
             obj.stack = permute(obj.stack,[2,1,3]);
+            obj.dim = permute(obj.dim,[2,1]); %Alessandra 
         end
         
         function obj = RotateStack(obj,angle)
             obj.stack = imrotate(obj.stack,angle);
             obj.dim = [size(obj.stack,1),size(obj.stack,2)];
+        end
+        
+        function obj = FlipStack(obj)  %Alessandra 
+            %FlipStack flips the order of the patterns in the stack
+            obj.stack = flip(obj.stack,length(size(obj.stack)));
+            obj.Mmatrix = flip(obj.Mmatrix,1);
+            obj.Tmatrix = flip(obj.Tmatrix,1);
+            
         end
         
         function obj = DeleteCW(obj)
