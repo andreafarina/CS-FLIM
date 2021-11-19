@@ -73,7 +73,28 @@ classdef CSpattern
                     obj.cw = 0;
                     
                 case 'fourier'
-                    % to be implemented
+                    % order = [Nsin Nphase L]
+                    % no Mmatrix and Tmatrix are created
+                    npatt = order(1);
+                    nphase = order(2);
+                    L = order(3);
+                    obj.dim = [L,L];
+                    obj.order = order(1);
+                    obj.cw = 1;
+                    obj.kind = [num2str(nphase),'_phase'];
+                    
+                    x = [1:L]; 
+                    y = [1:L]; 
+                    [xx,yy] = meshgrid(x,y); 
+                    obj.stack = zeros(L,L,npatt*nphase); 
+                    % manually create nphase CW patterns
+                    obj.stack(:,:,1:nphase) = 0.5;
+                    for i = nphase + 1:npatt*nphase
+                        Tx = L/(floor((i-1)/nphase));
+                        phase = 2*pi/nphase*(i-1);
+                        obj.stack(:,:,i) = 0.5 + 0.5*sin(2*pi/Tx*xx + phase); 
+                    end
+                                        
                 case 'demo_numbers'
                     dd = [256,256];
                     obj.dim = [order,order];
@@ -97,7 +118,7 @@ classdef CSpattern
                     disp('Pattern not found');
                     return;
             end
-            obj.Npatt = size(obj.Mmatrix,1);
+            obj.Npatt = size(obj.stack,3);
             obj.type = lower(type);
         end
         
@@ -168,11 +189,20 @@ classdef CSpattern
             
         function obj = TransposeStack(obj)
             obj.stack = permute(obj.stack,[2,1,3]);
+            obj.dim = permute(obj.dim,[2,1]); %Alessandra 
         end
         
         function obj = RotateStack(obj,angle)
             obj.stack = imrotate(obj.stack,angle);
             obj.dim = [size(obj.stack,1),size(obj.stack,2)];
+        end
+        
+        function obj = FlipStack(obj)  %Alessandra 
+            %FlipStack flips the order of the patterns in the stack
+            obj.stack = flip(obj.stack,length(size(obj.stack)));
+            obj.Mmatrix = flip(obj.Mmatrix,1);
+            obj.Tmatrix = flip(obj.Tmatrix,1);
+            
         end
         
         function obj = DeleteCW(obj)
