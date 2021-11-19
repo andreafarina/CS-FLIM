@@ -3,7 +3,7 @@ function [lifetime,concentration] = CheckDataConsistencyFLIM(lifetime,concentrat
         %Athreshold = Athreshold/100;
         Tthreshold = Tthreshold/100;
         % values below a threshold are 0. to move the zero lifetime in the last page:
-        lifetime(concentration(:)<=Athreshold) = 1e5;
+        %lifetime(concentration(:)<=Athreshold) = 1e5;
         concentration(concentration(:)<=Athreshold) = 0;
     
     %% sort tau1 and tau2 according to tau1<tau2
