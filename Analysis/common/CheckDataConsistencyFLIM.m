@@ -13,7 +13,8 @@ function [lifetime,concentration] = CheckDataConsistencyFLIM(lifetime,concentrat
        [B,I] = sort(taus,3);
        
        r = repmat(1:size(taus,1),[1 size(taus,2)*size(taus,3)]);
-       c = repmat(1:size(taus,1),[size(taus,2) size(taus,3)]);
+       c = repmat(1:size(taus,2),[size(taus,1) size(taus,3)]);
+       r = r(:)';
        c = c(:)';
        p = I(:)';
        s = sub2ind(size(taus),r,c,p);
