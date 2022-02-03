@@ -13,7 +13,7 @@ for li = 1:size(lifetime,1)
         I(:,:,1) = B./max(max(B));
         % Additionally, I want shot times in blue and long in
         % red:
-        I(:,:,1) =  1-I(:,:,1);
+        %I(:,:,1) =  1-I(:,:,1);
         %I limit the color wheel to a degree
         % lower than 360° (both 0° and 360° are red).
         I(:,:,1) = I(:,:,1).*(260/360);
@@ -23,7 +23,8 @@ for li = 1:size(lifetime,1)
         imagesc(hsv2rgb(I)),axis image,
         hsv = [flipud(linspace(0,260/360,255)); ones(1,255);ones(1,255)]';
         rgb = hsv2rgb(hsv);
-        colormap(flipud(rgb))
+        %colormap(flipud(rgb))
+        colormap(rgb)
         cb = colorbar;
         cb.Ticks = linspace(0,1,8);
         cb.TickLabels = round(linspace(min(min(A(A>0))),max(max(A)),length(cb.Ticks)),1);
