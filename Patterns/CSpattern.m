@@ -339,6 +339,9 @@ classdef CSpattern
                     h5writeatt(filename,dataset,'type',obj.type);
                     h5writeatt(filename,dataset,'order',uint8(obj.order));
                     h5writeatt(filename,dataset,'kind',obj.kind);
+                    if nargin > 2
+                        h5writeatt(filename,dataset,'seed',uint16(obj.seed));
+                    end
                     h5writeatt(filename,dataset,'cw',uint8(obj.cw));
             end
         end
