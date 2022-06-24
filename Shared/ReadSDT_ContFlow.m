@@ -7,6 +7,8 @@ elseif Nbanks<100
     strform = '%02.f';
 elseif Nbanks <1000
     strform = '%03.f';
+elseif Nbanks <10000
+    strform = '%04.f';
 end
 y = zeros(Ntime,Nlambda,Nbanks*Nsteps);
 for i = 1:Nbanks
