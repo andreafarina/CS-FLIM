@@ -3,7 +3,7 @@ function [im] = SHReconstruction(had,M,flag_flip)
 % flag_flip is a tick that flips left-right the reconstructed image
 L = size(had,2);
 T = size(had,1);
-M = squeeze(M(1:2:end,:,:)-M(2:2:end,:,:));
+
 %B = fwht(eye(sqrt(size(had,3))^2),[],'hadamard');
 for li = 1:L
     parfor ti = 1:T
