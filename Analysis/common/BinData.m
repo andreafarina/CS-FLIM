@@ -30,7 +30,11 @@ if strcmp(bin_type,'Bin') == 1
         end
         %t = t(2:end-1);
     end
+    if abs((t(2)-t(1))-dt)>(dt/2)
+        disp('Some problems determining the desired bin size.')
+    end
     dt = t(2)-t(1);
+     
 else
     
     for li = 1:size(data,2)
