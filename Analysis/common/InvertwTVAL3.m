@@ -1,6 +1,4 @@
-function [im_TVAL,opts] = InvertwTVAL3(had,m,M,imA,K,mu,beta)
-
-PLOT_ITERATIONS = 1;
+function [im_TVAL,opts] = InvertwTVAL3(had,m,M,imA,K,mu,beta,PLOT_ITERATIONS)
 
 % Rescale reference image from CCD to fit scale of SPC dataset
 
@@ -17,6 +15,7 @@ opts.beta = beta; %default value, suggested by authors
 opts.maxit = 3000;
 opts.tol = 1E-8;
 opts.isreal = true;
+
 %% Display
 if PLOT_ITERATIONS == 1
     [~, pPix] = min(abs(imA(:)-0.5*max(imA(:))));
@@ -48,5 +47,7 @@ for ti = 1:size(had,1)
     disp(['Processed: ',num2str(100*ti/size(had,1)),'%']);
 end
 im_TVAL = res;
+if PLOT_ITERATIONS == 1
 close(c);
+end
 end
