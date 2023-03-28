@@ -1,5 +1,10 @@
-function [] = ImageReconstruction(app)
+function [app] = ImageReconstruction(app)
 
+            if isfield(app,'visplot')==1
+               visplot = app.visplot;
+            else    
+               visplot = 1;
+            end
             
             spc_raw = app.spc;
             app.spc = app.spc(app.t_start:app.t_stop,app.l_start:app.l_stop,:);
@@ -93,7 +98,7 @@ function [] = ImageReconstruction(app)
                 ratio = app.RatioEditField.Value/100;
                 K = size(app.had,3);
                 m = round((1-ratio)*K);
-                [im,opts] = InvertwTVAL3(app.had,m,M,app.camera,sqrt(K),eval(app.TVALmu.Value),eval(app.TVALbeta.Value));
+                [im,opts] = InvertwTVAL3(app.had,m,M,app.camera,sqrt(K),eval(app.TVALmu.Value),eval(app.TVALbeta.Value),visplot);
                 assignin('base', 'tval_opts', opts);
             end
             app.im = im;
