@@ -1,4 +1,4 @@
-function [stepSize,breakCond] = backTrackingLineSearch(fun,startPos,gradient,initStepSize,ctrlParam)
+function [stepSize,breakCond,f1,f2] = backTrackingLineSearch(fun,startPos,gradient,initStepSize,ctrlParam)
 %backTrackingLineSearch Backtracking line search
 %   Method based on the Armijo-Goldstein condition to find an adequate step
 %   size for gradient descent minimization
@@ -22,6 +22,9 @@ function [stepSize,breakCond] = backTrackingLineSearch(fun,startPos,gradient,ini
 %             error('Error: backtracking doesn''t seem to find a good step size. Maximum steps reached.')
         elseif stepSize < 1e-12
             breakCond = 1;
+            disp('**************************************************************************************************************')
+         disp('Backtracking Iteration stopped. Backtracking doesn''t seem to find a good step size. Estimation may be already good enough.')
+         
             break;
 %             error('Error: backtracking doesn''t seem to find a good step size. Estimation may be already good enough.')
         end
