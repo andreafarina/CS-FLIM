@@ -1,4 +1,4 @@
-function [handle] = Read_PTU(tInt,R,N)  
+function [handle] = Read_PTU(tInt,R,N,filename,pathname)  
 %function Read_PTU_AG % Read PicoQuant Unified TTTR Files
 % This is demo code. Use at your own risk. No warranties.
 % Marcus Sackrow, PicoQuant GmbH, December 2013
@@ -42,7 +42,7 @@ MeasDesc_Resolution = 0;
 MeasDesc_GlobalResolution = 0;
 
 % start Main program
-[filename, pathname]=uigetfile('*.ptu', 'T-Mode data:');
+%[filename, pathname]=uigetfile('*.ptu', 'T-Mode data:');
 fid=fopen([pathname filename]);
 
 fprintf(1,'\n');
@@ -166,9 +166,12 @@ markIntervals(end) = markIntervals(end-1)*3;
 %Rewind dataset and skip header
 fseek(fid, endOfHeader+4, -1); %after read marker go back to previous position
 disp('Markers found.')
-if not(length(markIntervals) == N*R)
+bar = waitbar(0,'Reading data');
+if length(markIntervals) < N*R
     disp('Missing markers. Measurement incomplete.')
-    return;
+    R = ceil((length(markIntervals)/N));
+    %handle = [];
+    %return;
 end
 T3Record = fread(fid, posMarkers(1)-2, 'ubit32'); % first void measurements: keep them for OVF
 nsync = bitand(T3Record,1023);                  % the lowest 10 bits:
@@ -182,6 +185,7 @@ for i = 1:length(markIntervals)
 
     T3Record = fread(fid, markIntervals(i)+1, 'ubit32');
     fseek(fid, -4, 0);
+    
     nsync = bitand(T3Record,1023);                  % the lowest 10 bits:
     dtime = bitand(bitshift(T3Record,-10),32767);   % the next 15 bits:
     channel = bitand(bitshift(T3Record,-25),63);    % the next 6 bits:
@@ -207,28 +211,29 @@ for i = 1:length(markIntervals)
     else
         k = k + 1;
     end
+    waitbar(round(i/length(markIntervals),2),bar,'Reading data');
 
 end
-
-if exist([pathname, '/Converted/'],'file') == 0
-    mkdir([pathname, '/Converted/'])
+close(bar);
+if exist([pathname, 'Converted\'],'file') == 0
+    mkdir([pathname, 'Converted\'])
 end
 
-save([pathname, '/Converted/',filename(1:end-4),'_folded.mat'],'measurement','-v7.3');
-handle = [pathname, '/Converted/',filename(1:end-4),'_folded.mat'];
+save([pathname, 'Converted\',filename(1:end-4),'_folded.mat'],'measurement','-v7.3');
+handle = [pathname, 'Converted\',filename(1:end-4),'_folded.mat'];
 end
 
 function [spc] = CreateHistogram(intTime,photons)
 intTime = intTime*1e6;
 markers = find(photons(:,1)==1);
 N = (length(markers)-1);
-spc = zeros(2^16-1,1,N);
+spc = zeros(2^16,1,N);
 for k = 1:N
     P = photons((markers(k)+1):(markers(k+1)-1),:);
     P(:,2) = P(:,2)-photons(markers(k),2);
     P(P(:,1)==63,:) = [];
     P(P(:,2)>intTime,:) = []; %remove counts arrived after the projection time
-    spc(:,1,k) = histcounts(P(:,3),1:2^16);
+    spc(:,1,k) = histcounts(P(:,3),0:2^16);
 end
 spc = spc(1:2520,1,:);
 end
