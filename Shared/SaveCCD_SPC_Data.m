@@ -6,19 +6,21 @@ function SaveCCD_SPC_Data
 % =========================================================================
 %% Select if CCD file or SPC file
 CCD = 1;
+CMOS = 0;
 SPC = 0;
 MANTA = 0;
 %% Path
 data_folder = '\\nas-dfis.fisica.polimi.it\work\DATA\CS_FLIM\Microscope';
 out_folder = 'C:\Users\ghezz\OneDrive - Politecnico di Milano\FLIM Setup\Data\';
 ccd_ext='SPE';
+cmos_ext='tif';
 tr_ext='sdt'; %if manta -> sdtm
 
 %% Measurement info
-day = '20210607';
-prefix = '520_CELLS10_550_550_610';
+day = '20220704';
+prefix = '520_6CELLSP3ht20xPos50x10_550_550_650';
 N_Pattern_IN = 1;%16*16*2+1;                          % Input pattern number                                          % Angle number
-N_Pattern_OUT = 2;%2*8*8;%16*16*2+1;               % Output pattern number
+N_Pattern_OUT = 2;%2*8*8;%16*16*2+1;                  % Output pattern number
 
 CF = 0; % Select if the SPC has been acquired with Continuous Flow (1 = Yes)
 
@@ -31,9 +33,11 @@ elseif MANTA == 1
     Num_chan = 16384;    %Manta 16384 Becker 4096
 elseif CCD == 1
     N_lambda = 1;
+elseif CMOS == 1
+    N_lambda = 1;    
 end
 
-% CCD parameters
+% CCD/CMOS parameters
 Npixel = 512;                                         % 512x512 pixwl sensor
 B = 1;                                                % Hardware binning
 
@@ -46,6 +50,8 @@ out_path = [out_folder,filesep,day,filesep];
 %% otutup filename
 if CCD == 1
     output_file = [prefix,'_CCD_raw'];
+elseif CMOS == 1
+    output_file = [prefix,'_CMOS_raw'];
 elseif SPC == 1
     output_file = [prefix,'_SPC_raw'];
 elseif MANTA == 1
@@ -54,6 +60,19 @@ end
 %% Data format
 filepath = [data_path prefix];
 
+%% CMOS file
+if CMOS == 1
+    warning off
+    tic;
+    i = 1;
+    for j = 1:N_Pattern_IN
+        for k = 1:N_Pattern_OUT
+            camera(:,:,i,j,k) = double(read(Tiff([filepath '_' num2str(0) '_' num2str(j-1) '_' num2str(k-1) '.',cmos_ext],'r')));
+        end
+    end
+    toc;
+    
+end
 %% CCD file
 if CCD == 1
     camera = zeros(Npixel/B,Npixel/B,N_lambda,N_Pattern_IN,N_Pattern_OUT);
@@ -88,7 +107,7 @@ if SPC == 1
         end
     else
         bits = 2^21/2^ceil(log2(N_lambda));
-        data = ReadSDT_ContFlow(filepath,Num_chan,N_lambda,(N_Pattern_OUT-1)/(bits/Num_chan),bits/Num_chan);
+        data = ReadSDT_ContFlow(filepath,Num_chan,N_lambda,(N_Pattern_IN-1)/(bits/Num_chan),bits/Num_chan);
         [~,b] = min(sum(data,1:2));
         spc(:,:,1) = data(:,:,b); % Replicate the "off pattern" measurement and put it at the beginning, to be used as a background
         spc(:,:,2:end) = data;
@@ -105,9 +124,9 @@ end
 
 %% SPC file
 if MANTA == 1
-    spc=zeros(Num_chan,N_lambda,N_Pattern_OUT);
+    spc=zeros(Num_chan,N_lambda,N_Pattern_IN);
     tic;
-    for k = 1:N_Pattern_OUT
+    for k = 1:N_Pattern_IN
         all_data = readBinaryMANTA([filepath '_' num2str(0) '_' num2str(0) '_' num2str(k-1) '.' tr_ext]);
         spc(:,:,k) = reshape(all_data,[Num_chan N_lambda]);
     end
@@ -123,6 +142,8 @@ if CCD == 1
     save(out_filepath,'camera','-v7.3');
 elseif SPC == 1 || MANTA == 1
     save(out_filepath,'spc','-v7.3');
+elseif CMOS == 1 
+    save(out_filepath,'camera','-v7.3');
 end
 end
 
