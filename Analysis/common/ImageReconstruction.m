@@ -9,11 +9,11 @@ function [app] = ImageReconstruction(app)
             spc_raw = app.spc;
             app.spc = app.spc(app.t_start:app.t_stop,app.l_start:app.l_stop,:);
             
-            if app.IntegralovertimeCheckBox.Value == 1
+            if app.SumTimeCheckBox.Value == 1
                 app.spc = sum(app.spc,1);
             end
             
-            if app.IntegraloverwavelengthCheckBox.Value == 1
+            if app.SumCheckBox.Value == 1
                 app.spc = sum(app.spc,2);
             end
             
@@ -69,7 +69,7 @@ function [app] = ImageReconstruction(app)
                     if file == 0
                         return;
                     end
-                    load([path file],'M');
+                    load([path file],'M','Pc','Pr');
                     app.loaded = 1;
                     app.M = M;
                 end
@@ -89,7 +89,7 @@ function [app] = ImageReconstruction(app)
                     case 'Walsh-Hadamard'
                         im = WHReconstruction(had,flag_flip);
                     case 'Scrambled-Hadamard'
-                        im = SHReconstruction(had,M,flag_flip);
+                        im = SHReconstruction(had,M,flag_flip,Pc,Pr);
                     case 'Raster Scan'
                         im = reshape(app.spc(:,:,1:app.XEditField_2.Value*app.XEditField.Value),[size(app.spc,1) size(app.spc,2) app.XEditField_2.Value app.XEditField.Value]);
                 end
