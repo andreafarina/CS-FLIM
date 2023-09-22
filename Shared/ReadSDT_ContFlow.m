@@ -13,6 +13,7 @@ end
 y = zeros(Ntime,Nlambda,Nbanks*Nsteps);
 for i = 1:Nbanks
     d = f_read_sdt_01([prefix_file,'_c',num2str(i-1,strform),'.sdt']);
+    %d = f_read_sdt_01([prefix_file,'.sdt']);
     d = reshape(d,[Ntime,Nlambda,Nsteps]);
     y(:,:,(1:Nsteps) + (i-1)*Nsteps) = d;
 end
