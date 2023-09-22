@@ -1,4 +1,4 @@
-function [im] = SHReconstruction(had,M,flag_flip)
+function [im] = SHReconstruction(had,M,flag_flip,Pc,Pr)
 % performs a ScrambledHadamard inversion on a had(time,lambda,coeff) dataset.
 % flag_flip is a tick that flips left-right the reconstructed image
 L = size(had,2);
