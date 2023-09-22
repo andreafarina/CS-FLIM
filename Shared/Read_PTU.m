@@ -139,11 +139,11 @@ while 1
     end
 end
 fprintf(1, '\n----------------------\n');
-%% READ DAND DECODE DATA
+%% READ AND DECODE DATA
 endOfHeader = ftell(fid);
 % % Constant provided by PicoQuant:
 T3WRAPAROUND = 1024;
-OverflowCorrection = 0;
+OverflowCorrection = 0; OverflowCorrectionReminder = 0;
 % Init
 b = 0;
 fseek(fid,0, 'eof');
@@ -157,9 +157,10 @@ while 1 %not(channel == 1)
             break;
         end
         channel((b+1):(b+length(T3Record)),1) = bitand(bitshift(T3Record,-25),63);    % the next 6 bits:
+        special((b+1):(b+length(T3Record)),1) = bitand(bitshift(T3Record,-31),1);    
         b = b+length(T3Record);
 end
-posMarkers = find(channel==1);
+posMarkers = find((channel==1)&(special==1));
 posMarkers(end+1) = length(channel);
 markIntervals = diff(posMarkers);
 markIntervals(end) = markIntervals(end-1)*3;
@@ -176,10 +177,9 @@ end
 T3Record = fread(fid, posMarkers(1)-2, 'ubit32'); % first void measurements: keep them for OVF
 nsync = bitand(T3Record,1023);                  % the lowest 10 bits:
 channel = bitand(bitshift(T3Record,-25),63);    % the next 6 bits:
-true_nSync = cumsum((channel==63).*(T3WRAPAROUND.*nsync));
-OverflowCorrection = true_nSync(end) + OverflowCorrection;
-
-spc = zeros(2520,1,N); measurement = zeros(R,2520,1,N+1);
+OverflowCorrection = cumsum((channel==63).*(T3WRAPAROUND.*nsync))+OverflowCorrectionReminder; %Conversion with overflow correction. Channel 63 means overflow
+OverflowCorrectionReminder = OverflowCorrection(end);
+%spc = zeros(2520,1,N); measurement = zeros(R,2520,1,N+1);
 k = 1; r = 1;
 for i = 1:length(markIntervals)
 
@@ -189,24 +189,23 @@ for i = 1:length(markIntervals)
     nsync = bitand(T3Record,1023);                  % the lowest 10 bits:
     dtime = bitand(bitshift(T3Record,-10),32767);   % the next 15 bits:
     channel = bitand(bitshift(T3Record,-25),63);    % the next 6 bits:
-    %special = bitand(bitshift(T3Record,-31),1);     % the last bit:
+    special = bitand(bitshift(T3Record,-31),1);     % the last bit:
     %
-    dtime(channel==1) = 0;
-    true_nSync = cumsum((channel==63).*(T3WRAPAROUND.*nsync));
-    timeTag = (nsync + true_nSync + OverflowCorrection)';
-    OverflowCorrection = true_nSync(end) + OverflowCorrection;
-    dataset = [(1:length(nsync))' channel (nsync + true_nSync) 1e9*timeTag'./TTResult_SyncRate dtime];
-    dataset = dataset(not(dataset(:,2)==63),[2 4 5]);
+    OverflowCorrection = cumsum((channel==63).*(T3WRAPAROUND.*nsync))+OverflowCorrectionReminder; %Conversion with overflow correction. Channel 63 means overflow
+    timeTag = (nsync + OverflowCorrection)';
+    rawData = [special channel (nsync + OverflowCorrection) 1e9*timeTag'./TTResult_SyncRate dtime];
+    rawData = rawData(not(rawData(:,2)==63),[1 2 4 5]);   % remove overflows
+    
     if i == length(markIntervals)
-       dataset(end+1,:) = [1 dataset(end,2) 0];
+       rawData(end+1,:) = [1 1 rawData(end,2) 0];
     end
-    spc(:,1,k) = CreateHistogram(tInt,dataset);
+    spc(:,:,k) = CreateHistogram(tInt,rawData);
     
     if k == N
-       A = zeros(2520,1,N+1);
+       A = zeros(2520,size(spc,2),N+1);
        A(:,:,2:(N+1)) = spc;
        measurement(r,:,:,:) = A;
-       spc = zeros(2520,1,N);
+       spc = zeros(2520,size(spc,2),N);
        k = 1; r = r + 1;
     else
         k = k + 1;
@@ -225,15 +224,21 @@ end
 
 function [spc] = CreateHistogram(intTime,photons)
 intTime = intTime*1e6;
-markers = find(photons(:,1)==1);
+markers = find((photons(:,1)==1)&(photons(:,2)==1));
 N = (length(markers)-1);
 spc = zeros(2^16,1,N);
 for k = 1:N
     P = photons((markers(k)+1):(markers(k+1)-1),:);
-    P(:,2) = P(:,2)-photons(markers(k),2);
-    P(P(:,1)==63,:) = [];
-    P(P(:,2)>intTime,:) = []; %remove counts arrived after the projection time
-    spc(:,1,k) = histcounts(P(:,3),0:2^16);
+    P(:,3) = P(:,3)-photons(markers(k),3);
+    P(P(:,2)==63,:) = [];
+    P(P(:,3)>intTime,:) = []; %remove counts arrived after the projection time
+    for ch = 1:16
+    counts = P(:,2)==(ch-1);
+    if sum(counts) > 0
+        spc(:,ch,k) = histcounts(P(counts,4),0:2^16);
+    end    
+    
+    end
 end
-spc = spc(1:2520,1,:);
+spc = spc(1:2520,:,:);
 end
