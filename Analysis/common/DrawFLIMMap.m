@@ -43,14 +43,4 @@ for li = 1:size(lifetime,1)
     end
 end
 
-
-for li=1:size(lifetime,1)
-    figure(size(lifetime,1)+li+50)
-    for n = 1:N
-        subplot(1,N,n)
-        taus = squeeze(lifetime(li,:,:,n));
-        histogram(taus(taus>0),round(numel(lifetime(li,:,:,n))/70))
-    end
-end
-
 end

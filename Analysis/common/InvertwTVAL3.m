@@ -28,6 +28,7 @@ if PLOT_ITERATIONS == 1
 end
 %% Solve
 [~,b] = max(squeeze(sum(had,1:2)));
+tic;
 for ti = 1:size(had,1)
     parfor li = 1:size(had,2)
         [had_rec, M1] = MoveCW2End(squeeze(had(ti,li,:)),M,b);  
@@ -46,6 +47,7 @@ for ti = 1:size(had,1)
     end
     disp(['Processed: ',num2str(100*ti/size(had,1)),'%']);
 end
+toc;
 im_TVAL = res;
 if PLOT_ITERATIONS == 1
 close(c);

@@ -1,3 +1,4 @@
+
 function [patch,h2,h] = plot_coloredenvelope(x,data, ref)
 
         options.handle     = figure;
@@ -11,7 +12,7 @@ function [patch,h2,h] = plot_coloredenvelope(x,data, ref)
     % Plotting the result
     h = figure(options.handle);
     x_vector = [options.x_axis, fliplr(options.x_axis)];
-    patch = fill(x_vector, [data+ref,fliplr(ref-data)], options.color_area);
+    patch = fill(x_vector, [max(data,[],2)',fliplr(min(data,[],2)')], options.color_area);
     set(patch, 'edgecolor', 'none');
     set(patch, 'FaceAlpha', options.alpha);
     hold on;
