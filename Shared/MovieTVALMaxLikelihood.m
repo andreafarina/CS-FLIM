@@ -1,4 +1,4 @@
-function [lifetime,concentrations] = FitMovMaxLikelihood(filenameSPC, filenameCMOS)
+function [lifetime,concentrations] = MovieTVALMaxLikelihood(filenameSPC, filenameCMOS)
 % Time Tagging TCPSC + SiPM CS-SPC Data Reconstruction
 % Alberto Ghezzi, Politecnico di Milano
 
@@ -13,7 +13,7 @@ end
 addpath ../Analysis/
 run('../Analysis/TVAL/warm_up.m')
 
-% Load patterns 
+% Load matrix used for generating patterns 
 load('FLIM_Scrambled-Hadamard_1024.mat','M');
 M = M(1:2:end,:);
 
@@ -94,49 +94,27 @@ opts = optimoptions('fminunc','TolFun',1e-6,'TolX',1e-6,...
         'Display','Off','StepTolerance',1e-6,...
         'OptimalityTolerance',1e-6);
 
-% Define a threshold to exclude noisy data:
-thA = 4;
-thC = 4;
-
 for xi = 1:size(Cimage,2)
     for yi = 1:size(Cimage,3)
-        if sum(Cimage(:,xi,yi))>thA*mean(mean(sum(Cimage,1)))
             ydata = squeeze(Cimage(:,xi,yi))';
             ydata = ydata./max(ydata);
             % Fit:
             x = fminunc(@objectivePOISS,x0,opts);
-            
+     
             c = (exp(-t./x(Ntau+1:end)'))'\squeeze(Cimage(:,xi,yi)); 
-            if sum(c)>thC 
-                plot(squeeze(Cimage(:,xi,yi))),hold on 
-                plot(sum(c).*exp(-t./((c'*x(Ntau+1:end)')/sum(c)))),hold off
-                drawnow
-                lifetime(i,xi,yi) = (c'*x(Ntau+1:end)')/sum(c);
-                concentrations(i,xi,yi) = sum(c);  
-            end
-        end
+            plot(squeeze(Cimage(:,xi,yi))),hold on 
+            plot(sum(c).*exp(-t./((c'*x(Ntau+1:end)')/sum(c)))),hold off
+            drawnow
+            lifetime(i,xi,yi) = (c'*x(Ntau+1:end)')/sum(c);
+            concentrations(i,xi,yi) = sum(c);  
     end
 end
 raw_data(i,:,:,:) = Cimage;
 end
 
-X = lifetime(lifetime(:)>0);
-ub = mean(X)+2*std(X);
-lb = mean(X)-2*std(X);
-concentrations(lifetime(:)>ub) = 0;
-lifetime(lifetime(:)>ub) = 0;
-concentrations(lifetime(:)<lb) = 0;
-lifetime(lifetime(:)<lb) = 0;
 %% Load camera file:
 cmos = load(filenameCMOS);
 camera = cmos.camera;
-if size(camera,2)>=512 %Downscale CMOS image to 256x256 for computation speed performance
-    for nframes = 1:size(camera,1)
-        camera_usa(nframes,:,:) = imresize(squeeze(camera(nframes,:,:)),[256 256],'box');
-    end
-    camera = camera_usa;
-end
-camera = camera(32:(32+nRep-1),:,:);
 
 filename = [winqueryreg('HKEY_CURRENT_USER', 'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders', 'Desktop'), filesep,'Result.mp4'];
 figure(100)
