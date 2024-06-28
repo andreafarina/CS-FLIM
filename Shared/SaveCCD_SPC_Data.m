@@ -11,16 +11,16 @@ SPC = 1;
 MANTA = 0;
 %% Path
 data_folder = 'C:\DATA';%'C:\Users\laboratorio\Documents';
-out_folder = 'C:\DATA\';
+out_folder = 'C:\DATA';
 ccd_ext='SPE';
 cmos_ext='tif';
 tr_ext='sdt'; %if manta -> sdtm
 
 %% Measurement info
-day = '20240405';
+day = 'New folder';
 %prefix = '520_BEADSRevival100ms_550_550_610';
-prefix = '520_Cells1-patt64-100ms_550_550_625';
-N_Pattern_IN = 513; %1056+1;%16*16*2+1;                          % Input pattern number                                          % Angle number
+prefix = 'cells-1-spc';
+N_Pattern_IN = 160+1; %1056+1;%16*16*2+1;                          % Input pattern number                                          % Angle number
 N_Pattern_OUT = 1; %2*8*8;%16*16*2+1;                  % Output pattern number
 
 CF = 1; % Select if the SPC has been acquired with Continuous Flow (1 = Yes)
