@@ -10,17 +10,18 @@ CMOS = 0;
 SPC = 1;
 MANTA = 0;
 %% Path
-data_folder = '\\nas-dfis.fisica.polimi.it\work\DATA\Foglie';
-out_folder = 'C:\Users\ghezz\OneDrive - Politecnico di Milano\FLIM Setup\Data\';
+data_folder = 'C:\DATA';%'C:\Users\laboratorio\Documents';
+out_folder = 'C:\DATA';
 ccd_ext='SPE';
 cmos_ext='tif';
 tr_ext='sdt'; %if manta -> sdtm
 
 %% Measurement info
-day = '20230620';
-prefix = 'Meas15';
-N_Pattern_IN = 32*4+1;%16*16*2+1;                     % Input pattern number                                          % Angle number
-N_Pattern_OUT = 1;%2*8*8;%16*16*2+1;                  % Output pattern number
+day = 'New folder';
+%prefix = '520_BEADSRevival100ms_550_550_610';
+prefix = 'cells-1-spc';
+N_Pattern_IN = 160+1; %1056+1;%16*16*2+1;                          % Input pattern number                                          % Angle number
+N_Pattern_OUT = 1; %2*8*8;%16*16*2+1;                  % Output pattern number
 
 CF = 1; % Select if the SPC has been acquired with Continuous Flow (1 = Yes)
 
@@ -67,7 +68,7 @@ if CMOS == 1
     i = 1;
     for j = 1:N_Pattern_IN
         for k = 1:N_Pattern_OUT
-            camera(:,:,i,j,k) = rot90(double(read(Tiff([filepath '_' num2str(0) '_' num2str(j-1) '_' num2str(k-1) '.',cmos_ext],'r'))),2);
+           camera(:,:,i,j,k) = rot90(double(read(Tiff([filepath '_' num2str(0) '_' num2str(j-1) '_' num2str(k-1) '.',cmos_ext],'r'))),2);
         end
     end
     toc;

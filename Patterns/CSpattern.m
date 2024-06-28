@@ -33,7 +33,7 @@ classdef CSpattern
                 case 'hadamard'
                     obj.dim = [order,order];
                     obj.Mmatrix = hadamard(order.^2);
-                    obj.Tmatrix = obj.Mmatrix;
+                    obj.Tmatrix = obj.Mmatrix'; % ! It is needed for reshape and patterns are in rows
                     obj.stack = reshape(obj.Tmatrix,[order,order,order^2]);
                     obj.order = order;
                     obj.cw = 1;
@@ -113,7 +113,23 @@ classdef CSpattern
                     obj.stack = reshape(obj.Mmatrix,[order,order,order^2]);
                     obj.order = order;
                     obj.cw = 0;
-                     
+                 case 'dct'
+                    obj.dim = [order,order];
+                    obj.Mmatrix = dctmtx(order.^2);
+                    obj.Mmatrix = obj.Mmatrix + abs(min(obj.Mmatrix,[],"all"));
+                    obj.Mmatrix = obj.Mmatrix./max(obj.Mmatrix,[],"all");
+                    obj.Tmatrix = obj.Mmatrix;
+                    obj.stack = reshape(obj.Tmatrix,[order,order,order^2]);
+                    obj.order = order;
+                    obj.cw = 1;    
+                 case 'custom'
+                    obj.dim = [order,order];
+                    obj.Mmatrix = load('C:\Programmi laboratorio\DOT\DATA\20240625\128P_207946-17_09.mat');
+                    obj.Mmatrix = obj.Mmatrix.Hr;
+                    obj.Tmatrix = obj.Mmatrix;
+                    obj.stack = reshape(obj.Tmatrix,[order,order,size(obj.Tmatrix,2)]);
+                    obj.order = order;
+                    obj.cw = 1;    
                 otherwise
                     disp('Pattern not found');
                     return;
